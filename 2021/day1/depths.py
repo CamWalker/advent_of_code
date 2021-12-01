@@ -1,4 +1,4 @@
-myDepths = (
+my_depths = (
 	199,
 	203,
 	200,

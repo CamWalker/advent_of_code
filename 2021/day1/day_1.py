@@ -11,10 +11,10 @@ def generate_3m_windows (depths):
 
 
 def count_depth_increases(depths):
-	increaseCount = 0
+	increase_count = 0
 	for i in range(len(depths)):
 		if i - 1 >= 0 and depths[i] > depths[i - 1]:
-			increaseCount += 1
-	return increaseCount
+			increase_count += 1
+	return increase_count
 
-print(count_depth_increases(generate_3m_windows(myDepths)))
+print(count_depth_increases(generate_3m_windows(my_depths)))
