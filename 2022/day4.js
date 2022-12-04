@@ -1,5 +1,3 @@
-const { sum, intersection } = require('./utils');
-
 // const input = `2-4,6-8
 // 2-3,4-5
 // 5-7,7-9
@@ -1011,6 +1009,7 @@ const input = `71-97,71-72
 function main(inp) {
 	return inp
 		.split('\n')
+		// convert to nested array of integers
 		.map(v => v
 			.split(',')
 			.map(v => v
