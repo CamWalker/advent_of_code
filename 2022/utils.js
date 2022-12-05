@@ -8,3 +8,7 @@ exports.intersection = function intersection(str1, str2) {
 		?.join('')
 		?? '';
 }
+
+exports.extractAll = function extractAll(input, regex) {
+	return [...input.matchAll(new RegExp(regex, 'g'))].reduce((arr, match) => arr.concat(match),[]);
+}
