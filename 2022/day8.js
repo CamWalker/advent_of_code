@@ -208,10 +208,6 @@ function main(inp) {
 			}
 		}
 
-		if (leftScore * rightScore * bottomScore * topScore === 230958) {
-			console.log(x, y, leftScore, rightScore, bottomScore, topScore, leftScore * rightScore * bottomScore * topScore)
-
-		}
 		return leftScore * rightScore * bottomScore * topScore;
 	}
 
