@@ -1091,7 +1091,7 @@ function day7(inp, threshold) {
 				const [dir, name] = line.split(' ');
 				const directory = currentDirectory.addDirectory(name);
 				allDirectories.push(directory);
-			} else if (/\d+\s/.test(line)) {
+			} else if (/^\d+\s/.test(line)) {
 				const [size, name] = line.split(' ');
 				currentDirectory.addFile(name, size);
 			}
