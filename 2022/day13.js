@@ -479,63 +479,37 @@ function compare(left, right) {
 	const rightType = typeof right;
 	if (leftType === 'number' && rightType === 'number') {
 		return left - right;
-	} else if (leftType === 'object' && rightType === 'object') {
-		const length = Math.max(left.length , right.length);
-		let comparison = 0;
-		for (let i = 0; i < length; i++) {
-			const leftValue = left?.[i];
-			const rightValue = right?.[i];
-			if (leftValue === undefined && rightValue === undefined) {
-				return 0;
-			} else if (leftValue === undefined) {
-				return -1;
-			} else if (rightValue === undefined) {
-				return 1;
-			} else {
-				comparison = compare(leftValue, rightValue);
-				if (comparison === 0) {
-					continue;
-				} else {
-					return comparison;
-				}
-			}
-		}
-		return comparison; 
-	} else if (leftType === 'number') {
-		const leftValue = [left];
-		return compare(leftValue, right);
-	} else {
-		const rightValue = [right];
-		return compare(left, rightValue);
 	}
+	const leftValue = leftType === 'number' ? [left] : left;
+	const rightValue = rightType === 'number' ? [right] : right;
+	const length = Math.min(leftValue.length , rightValue.length);
+	for (let i = 0; i < length; i++) {
+		comparison = compare(leftValue[i], rightValue[i]);
+		if (comparison !== 0) {
+			return comparison;
+		}
+	}
+	return leftValue.length - rightValue.length;
 }
 
 function part1(input) {
 	return Array.buildGrid(input, '\n\n', '\n')
-		.mapGrid(cell => eval(cell))
+		.mapGrid(eval)
 		.map(([left, right]) => compare(left, right))
-		.reduce((sum, v, i) => {
-			if (v < 0) {
-				return sum + i + 1;
-			}
-			return sum;
-		}, 0);
+		.filterMap((v, i) => [v < 0, i + 1])
+		.sum();
 }
 
 function part2(input) {
 	const extra = '\n[[2]]\n[[6]]';
 	return (input + extra)
 		.split(/\n+/)
-		.map(cell => eval(cell))
+		.map(eval)
 		.sort(compare)
-		.reduce((arr, v, i) => {
-			if (extra.includes(JSON.stringify(v))) {
-				arr.push(i + 1);
-			}
-			return arr
-		}, [])
+		.filterMap((v, i) => [extra.includes(JSON.stringify(v)), i + 1])
 		.product()
 }
 
-const result = part2(inp);
+// const result = part1(inp);
+const result = part2(sample);
 console.log(result);

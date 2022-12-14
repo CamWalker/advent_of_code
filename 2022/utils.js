@@ -29,6 +29,19 @@ Array.prototype.mapGrid = function(cb) {
 	return clonedGrid;
 }
 
+Array.prototype.filterMap = function filterMap(cb) {
+	const returnVal = [];
+	for (let i = 0; i < this.length; i++) {
+		const result = cb(this[i], i, this);
+		const keep = result?.[0]
+		const value = result?.[1]
+		if (!!keep) {
+			returnVal.push(value)
+		}
+	}
+	return returnVal;
+}
+
 Array.prototype.sum = function sum(a, b) {
 	return this.reduce((sum, val) => sum + val, 0);
 }
