@@ -7,7 +7,7 @@ wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw`;
 
-const { sum, intersection } = require('./utils');
+const { sum, intersection } = require('../utils');
 
 function getLetterScore(char) {
 	const isUpper = char.toUpperCase() === char;

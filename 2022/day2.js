@@ -2503,7 +2503,7 @@ const input2 = `A Y
 B X
 C Z`;
 
-const { sum } = require('./utils');
+const { sum } = require('../utils');
 
 const outcomes = {
 	X: {

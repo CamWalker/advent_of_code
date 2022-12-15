@@ -1,4 +1,4 @@
-const utils = require('./utils');
+const utils = require('../utils');
 
 const sample = `[1,1,3,1,1]
 [1,1,5,1,1]

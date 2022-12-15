@@ -1,4 +1,4 @@
-const { extractAll } = require('./utils')
+const { extractAll } = require('../utils')
 
 const stacks1 = `    [D]    
 [N] [C]    

@@ -1,4 +1,4 @@
-const { product } = require('./utils');
+const { product } = require('../utils');
 
 const sampleInp = `Monkey 0:
 Starting items: 79, 98
