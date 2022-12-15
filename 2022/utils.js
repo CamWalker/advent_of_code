@@ -1,3 +1,7 @@
+Array.prototype.logGrid = function() {
+	const joinedRows = this.map(row => row.join(''));
+	console.log(joinedRows.join('\n'));
+}
 
 Array.buildGrid = function(input, rowSplit, colSplit) {
 	return input
