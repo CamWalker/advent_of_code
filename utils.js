@@ -33,6 +33,16 @@ Array.prototype.mapGrid = function(cb) {
 	return clonedGrid;
 }
 
+// empty
+Array.prototype.empty = function() {
+	return this.length === 0;
+}
+
+// last
+Array.prototype.last = function() {
+	return this[this.length - 1];
+}
+
 Array.prototype.filterMap = function filterMap(cb) {
 	const returnVal = [];
 	for (let i = 0; i < this.length; i++) {
