@@ -230,5 +230,46 @@ function part1(input, minutes) {
 	return findPressureReleased('AA', new Set(nonZeroValveNames), minutes);
 }
 
-const result = part1(inp, 30);
+function findPressureReleased2(startNodeName1, startNodeName2, remainingValves, minutesRemaining) {
+	const startNode1 = valveMap[startNodeName1];
+	const startNode2 = valveMap[startNodeName2];
+	const scores = [...remainingValves].map(valveName => {
+		const valve = valveMap[valveName];
+		const distance1 = startNode1.dist[valveName];
+		const distance2 = startNode2.dist[valveName];
+		const newMinutesRemaining = minutesRemaining - 1;
+		if (newMinutesRemaining <= 0) return 0;
+		const updatedRemainingValves = new Set(remainingValves);
+		updatedRemainingValves.delete(valveName);
+		return newMinutesRemaining * valve.rate + (
+			remainingValves.size > 0
+				? findPressureReleased(valveName, updatedRemainingValves, newMinutesRemaining)
+				: 0
+		);
+	});
+	const max = Math.max(...scores);
+	if (max === -Infinity) return 0;
+	return max;
+}
+
+function part2(input, minutes) {
+	valves = input
+		.split('\n')
+		.map(row => {
+			const a = row.match(/Valve ([A-Z]+) has flow rate=([\d]+); tunnels? leads? to valves? ([A-Z,\s]+)/);
+			const [, name, rate, neightbors] = [...a];
+			const valve =  new Node(name, parseInt(rate, 10), neightbors.split(', '));
+			valveMap[name] = valve;
+			return valve
+		});
+	valves.forEach(v => {
+		v.calcDistances();
+	});
+	const nonZeroValveNames = valves.filterMap(valve => [valve.rate !== 0, valve.name]);
+
+	return findPressureReleased2('AA', 'AA', new Set(nonZeroValveNames), minutes);
+}
+
+// const result = part1(inp, 30);
+const result = part2(inp, 26);
 console.log(result);
