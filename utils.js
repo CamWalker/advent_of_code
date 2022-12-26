@@ -27,7 +27,7 @@ Array.prototype.mapGrid = function(cb) {
 		clonedGrid.push([...row]);
 		for (let x = 0; x < row.length; x++) {
 			const cell = row[x];
-			clonedGrid[y][x] = cb(cell, y, x, this);
+			clonedGrid[y][x] = cb(cell, y, x, clonedGrid);
 		}
   }
 	return clonedGrid;

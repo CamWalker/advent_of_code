@@ -3,6 +3,10 @@ const utils = require('../utils');
 const sample = `Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
 Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.`;
 
+// 7 8 3
+// 12 7 3
+
+
 const inp = `Blueprint 1: Each ore robot costs 3 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 15 clay. Each geode robot costs 2 ore and 8 obsidian.
 Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 17 clay. Each geode robot costs 3 ore and 10 obsidian.
 Blueprint 3: Each ore robot costs 2 ore. Each clay robot costs 2 ore. Each obsidian robot costs 2 ore and 20 clay. Each geode robot costs 2 ore and 14 obsidian.
@@ -44,77 +48,74 @@ class Blueprint {
 		this.costs = costs;
 	}
 
-	maximize(rounds) {
-		let _producers = [0, 0, 0, 1];
-		let _resources = [0, 0, 0, 0];
+	nextRound(round, state) {
+		const states = [];
+		const elementsToBuy = this.costs
+			.map((cost) => cost.reduce((canBuy, elCost, elIndex) => canBuy && state.resources[elIndex] >= elCost, true));
+		
+		const originalProducers = [...state.producers];
+		elementsToBuy.forEach((el, elIndex) => {
+			if (el) {
+				const producers = [...state.producers];
+				const resources = [...state.resources];
+				// Buy new producer
+				producers[elIndex] += 1;
+				this.costs[elIndex].forEach((v, i) => {
+					resources[i] -= v;
+				});
 
-		const traverseTree = (round, producers, resources) => {
-			if (round <= 0) {
-				return resources[0];
+				// Generate resources
+				originalProducers.forEach((v, i) => {
+					resources[i] += v
+				})
+				states.push({
+					producers,
+					resources,
+					round,
+				});
 			}
+		});
 
-			// let indexToConsiderBuying;
 
-			// for (let costIndex = 0; costIndex < this.costs.length; costIndex++) {
-			// 	const elCost = this.costs[costIndex];
-			// 	const willBeAbleToBuy = elCost.reduce((bool, v, i) => bool && (v === 0 || producers[i] > 0), true);
-			// 	if (willBeAbleToBuy) {
-			// 		indexToConsiderBuying = costIndex;
-			// 		break;
-			// 	}
-			// }
+		// buy nothing
+		states.push({
+			producers: [...state.producers],
+			resources: state.resources.map((v, i) => {
+				return v + originalProducers[i];
+			}),
+			round,
+		});
 
-			const oldProducers = [...producers];
+		return states;
+	}
 
-			// const canBuy = this.costs.map((cost, index) => cost.reduce((bool, resourceCost, i) => bool && resources[i] >= resourceCost, true));
-			const maxRounds = this.costs.map(
-				(cost, index) => Math.ceil(cost.reduce(
-					(max, resourceCost, i) => Math.max(max, (resourceCost - resources[i]) / producers[i]), -Infinity)
-				)
-			);
+	maximize(rounds) {
+		let states = [{
+			producers: [0, 0, 0, 1],
+			resources: [0, 0, 0, 0],
+			round: 0,
+		}];
 
-			// const treePurchases = this.costs.filterMap((cost, index) => {
-			// 	if (canBuy[index]) {
-			// 		const newProducers = [...producers];
-			// 		newProducers[index] += 1;
-			// 		let newResources = [...resources];
-			// 		cost.map((v, i) => {
-			// 			newResources[i] -= v;
-			// 		});
-			// 		newResources = newResources.map((v, i) => v + oldProducers[i]);
-			// 		return [
-			// 			true,
-			// 			[round - 1, newProducers, newResources]
-			// 		]
-			// 	}
-			// 	return [false];
-			// });
+		for (let round = 0; round < rounds; round++) {
+			states = states.map(state => this.nextRound(round + 1, state)).flat();
 
-			// const newResources = resources.map((v, i) => v + oldProducers[i]);
+			// Prevent states from blowing up
+			states = states.sort((a, b) => {
+				const aScore = a.resources.reduce((score, v, i) => score + (((a.producers[i] * (rounds - round)) + a.resources[i]) * Math.pow(100, a.resources.length - i)), 0);
+				const bScore = b.resources.reduce((score, v, i) => score + (((b.producers[i] * (rounds - round)) + b.resources[i]) * Math.pow(100, b.resources.length - i)), 0);
+				return bScore - aScore;
+			}).slice(0, 1000);
 
-			// const options = [
-			// 	...treePurchases,
-			// 	[round - 1, [...producers], newResources],
-			// ];
-
-			// options.sort((a, b) => {
-			// 	const scoreA = calcScore(a[1], a[2], true);
-			// 	const scoreB = calcScore(b[1], b[2], true);
-			// 	return scoreB - scoreA;
-			// });
-
-			
-			// options.sort((a, b) => {
-			// 	const scoreA = calcScore(a[1], a[2], false);
-			// 	const scoreB = calcScore(b[1], b[2], false);
-			// 	return scoreB - scoreA;
-			// });
-			
-			console.log(rounds - round + 1, options);
-			return traverseTree(...options[0]);
+			states.sort((a, b) => {
+				const aScore = a.resources.reduce((score, v, i) => score + (a.resources[i] * Math.pow(100, a.resources.length - i)), 0);
+				const bScore = b.resources.reduce((score, v, i) => score + (b.resources[i] * Math.pow(100, b.resources.length - i)), 0);
+				return bScore - aScore;
+			});
 		}
 
-		return traverseTree(rounds, _producers, _resources);
+		console.log(states[0])
+
+		return states[0].resources[0];
 	}
 }
 
@@ -133,14 +134,31 @@ function part1(input, rounds) {
 		));
 	
 	return blueprints.map(b => b.maximize(rounds))
-		// .map((v, i) => v * (i + 1))
-		// .sum();
+		.map((v, i) => v * (i + 1))
+		.sum();
 }
 
-function part2(input) {
-	return input;
+function part2(input, rounds) {
+	const blueprints = input
+		.split('\n')
+		.slice(0, 3)
+		.map(row => row.split(' '))
+		.map(row => new Blueprint(
+			row[1].slice(0,1),
+			[
+				[0, parseInt(row[30], 10), 0, parseInt(row[27], 10)],
+				[0, 0, parseInt(row[21], 10), parseInt(row[18], 10)],
+				[0, 0, 0, parseInt(row[12], 10)],
+				[0, 0, 0, parseInt(row[6], 10)],
+			]
+		));
+	
+	return blueprints.map(b => b.maximize(rounds))
+		.product()
 }
 
 // const result = part1(inp);
-const result = part1(sample, 24);
+// const result = part1(sample, 24);
+const result = part2(inp, 32);
 console.log(result);
+// console.log(JSON.stringify(result, null, 4));
