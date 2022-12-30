@@ -230,20 +230,36 @@ function part1(input, minutes) {
 	return findPressureReleased('AA', new Set(nonZeroValveNames), minutes);
 }
 
-function findPressureReleased2(startNodeName1, startNodeName2, remainingValves, minutesRemaining) {
-	const startNode1 = valveMap[startNodeName1];
-	const startNode2 = valveMap[startNodeName2];
+function findPressureReleased2(playersStatus, remainingValves) {
+	const currentNode0 = valveMap[playersStatus[0].name];
+	const currentNode1 = valveMap[playersStatus[1].name];
+
 	const scores = [...remainingValves].map(valveName => {
+		let movingPlayer = 0;
+		if (playersStatus[0].minutes > playersStatus[1].minutes) {
+			movingPlayer = 0;
+		} else if (playersStatus[0].minutes < playersStatus[1].minutes) {
+			movingPlayer = 1;
+		} else if (currentNode0.dist[valveName] < currentNode1.dist[valveName]) {
+			movingPlayer = 0;
+		} else if (currentNode0.dist[valveName] > currentNode1.dist[valveName]) {
+			movingPlayer = 1;
+		}
+		const distance = valveMap[playersStatus[movingPlayer].name].dist[valveName];
 		const valve = valveMap[valveName];
-		const distance1 = startNode1.dist[valveName];
-		const distance2 = startNode2.dist[valveName];
-		const newMinutesRemaining = minutesRemaining - 1;
+
+		const newMinutesRemaining = playersStatus[movingPlayer].minutes - distance - 1;
 		if (newMinutesRemaining <= 0) return 0;
+
 		const updatedRemainingValves = new Set(remainingValves);
 		updatedRemainingValves.delete(valveName);
+
+		const newPlayersStatus = [{ ...playersStatus[0] }, { ...playersStatus[1] }];
+		newPlayersStatus[movingPlayer] = { name: valveName, minutes: newMinutesRemaining };
+
 		return newMinutesRemaining * valve.rate + (
 			remainingValves.size > 0
-				? findPressureReleased(valveName, updatedRemainingValves, newMinutesRemaining)
+				? findPressureReleased2(newPlayersStatus, updatedRemainingValves)
 				: 0
 		);
 	});
@@ -267,7 +283,16 @@ function part2(input, minutes) {
 	});
 	const nonZeroValveNames = valves.filterMap(valve => [valve.rate !== 0, valve.name]);
 
-	return findPressureReleased2('AA', 'AA', new Set(nonZeroValveNames), minutes);
+	return findPressureReleased2(
+		[{
+			name: 'AA',
+			minutes,
+		}, {
+			name: 'AA',
+			minutes,
+		}],
+		new Set(nonZeroValveNames),
+	);
 }
 
 // const result = part1(inp, 30);
