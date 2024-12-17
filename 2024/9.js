@@ -1,11 +1,16 @@
 const utils = require('../utils');
 
-const sample = ``;
+const sample = `2333133121414131402`;
 
 const inp = ``;
 
 function part1(input) {
-	return input;
+	
+    
+    return '0099811188827773336446555566'
+        .split('')
+        .map((v, i) => parseInt(v, 10) * i)
+        .sum();
 }
 
 function part2(input) {

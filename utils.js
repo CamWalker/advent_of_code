@@ -1,5 +1,5 @@
 Array.prototype.logGrid = function() {
-	const joinedRows = this.map(row => row.join(''));
+	const joinedRows = this.map(row => row.join('\t'));
 	console.log(joinedRows.join('\n'));
 }
 
@@ -32,6 +32,45 @@ Array.prototype.mapGrid = function(cb) {
   }
 	return clonedGrid;
 }
+
+Array.prototype.findPositions = function(value) {
+	const positions = [];
+	for (let y = 0; y < this.length; y++) {
+		const row = this[y];
+		for (let x = 0; x < row.length; x++) {
+			const cell = row[x];
+			if (cell === value) {
+				positions.push([y, x]);
+			}
+		}
+  	}
+	return positions;
+}
+
+const directions = [
+    { x: 0, y: -1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+    { x: 0, y: 1 },
+    { x: -1, y: 1 },
+    { x: -1, y: 0 },
+    { x: -1, y: -1 },
+];
+
+const cardinalDirections = [
+	{ y: 0, x: -1 },
+	{ y: -1, x: 0 },
+	{ y: 0, x: 1 },
+	{ y: 1, x: 0 }, 
+];
+
+const diagonalDirections = [
+    { x: 1, y: -1 },
+    { x: 1, y: 1 },
+    { x: -1, y: 1 },
+    { x: -1, y: -1 },
+];
 
 // empty
 Array.prototype.empty = function() {
@@ -75,3 +114,4 @@ exports.intersection = function intersection(str1, str2) {
 exports.extractAll = function extractAll(input, regex) {
 	return [...input.matchAll(new RegExp(regex, 'g'))].reduce((arr, match) => arr.concat(match),[]);
 }
+
